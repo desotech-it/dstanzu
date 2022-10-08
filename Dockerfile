@@ -29,6 +29,9 @@ RUN install /tmp/cli/core/v0.25.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
 
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND="noninteractive"
+# ENV for https://github.com/mikefarah/yq/
+ENV VERSION=v4.28.1 
+ENV BINARY=yq_linux_amd64
 RUN apt-get update -y \
   && apt-get upgrade -y \
   && apt-get install -y \
@@ -42,7 +45,10 @@ RUN apt-get update -y \
   && rm -rf /var/lib/{apt,dpkg,cache,log}/ \
   && /usr/bin/curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
   && chmod +x ./kubectl  \
-  && mv ./kubectl /bin/kubectl
+  && mv ./kubectl /bin/kubectl 
+RUN /usr/bin/curl -LO https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY} \
+  && chmod +x ./yq_linux_amd64  \
+  && mv ./yq_linux_amd64 /bin/yq
 ENV version=6
 COPY --from=builder /bin/signal /signal
 COPY --from=tanzu /usr/local/bin/tanzu /usr/local/bin/tanzu
