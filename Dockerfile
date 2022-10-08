@@ -37,6 +37,7 @@ RUN apt-get update -y \
      git \
      jq \
      unzip \
+     expect \
   && apt-get clean autoclean && apt-get autoremove --yes \
   && rm -rf /var/lib/{apt,dpkg,cache,log}/ \
   && /usr/bin/curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
