@@ -1,0 +1,31 @@
+FROM golang:1.18-alpine as builder
+
+ENV CGO_ENABLED=0
+
+RUN apk update --no-cache && \
+    apk upgrade --no-cache && \
+    apk add --no-cache --update ca-certificates make git && \
+    rm -rf /var/cache/apk* 
+ENV version=6
+WORKDIR /src/
+COPY signal/main.go signal/go.* /src/
+RUN CGO_ENABLED=0 go build -o /bin/signal
+
+
+FROM ubuntu:focal
+ENV DEBIAN_FRONTEND="noninteractive"
+RUN apt-get update -y \
+  && apt-get install -y \
+       wget \
+       git 
+ENV version=6
+COPY --from=builder /bin/signal /signal
+RUN wget https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh -O - | bash -
+WORKDIR  /tmp/
+RUN wget -O /tmp/tanzu-cli-bundle-linux-amd64.tar.gz https://download3.vmware.com/software/TKG-160/tanzu-cli-bundle-linux-amd64.tar.gz
+RUN tar zxvf /tmp/tanzu-cli-bundle-linux-amd64.tar.gz 
+RUN rm /tmp/tanzu-cli-bundle-linux-amd64.tar.gz
+RUN install /tmp/cli/core/v0.25.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+WORKDIR  /
+STOPSIGNAL SIGQUIT
+ENTRYPOINT ["./signal"]

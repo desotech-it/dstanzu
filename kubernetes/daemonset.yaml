@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: network-tools
+  labels:
+    tier: node
+    app: network-tools
+spec:
+  selector:
+    matchLabels:
+      tier: node
+      app: network-tools
+  template:
+    metadata:
+      labels:
+        tier: node
+        app: network-tools
+    spec:
+      hostNetwork: true
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: network-tools
+        image: r.deso.tech/dsk/dstanzu:latest
+        resources:
+          requests:
+            cpu: "1m"
+            memory: "20Mi"
+          limits:
+            cpu: "10m"
+            memory: "20Mi"
+        securityContext:
+          runAsUser: 0
+          capabilities:
+            add: ["NET_ADMIN"]
