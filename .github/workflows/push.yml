@@ -23,7 +23,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: r.deso.tech/dsk/dsutils
+          images: r.deso.tech/dsk/dstanzu
           flavor: |
             latest=true
           tags: |
